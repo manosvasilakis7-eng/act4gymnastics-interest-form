@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "./supabaseClient";
+import Field from "./Field";
+import GlobalStyles from "./GlobalStyles";
 
 /* ---------------------------------------------------------
    Φόρμα Εκδήλωσης Ενδιαφέροντος — ACT4 Gymnastics
@@ -54,7 +56,7 @@ export default function InterestForm() {
   };
 
   const handleSubmit = async () => {
-    if (saving) return; // αποτρέπει διπλές υποβολές
+    if (saving) return;
 
     const e = validate();
     const keys = Object.keys(e);
@@ -118,4 +120,86 @@ export default function InterestForm() {
             <div className="header">
               <img src="/logo.png" alt="ACT4 Gymnastics" className="logo" />
               <h1>Εκδήλωση Ενδιαφέροντος</h1>
-              
+              <p>Συμπληρώστε τη φόρμα και θα επικοινωνήσουμε μαζί σας το συντομότερο δυνατό.</p>
+            </div>
+
+            <section className="section" id="f-sport">
+              <h3 className="section-title">Άθλημα</h3>
+              {errors.sport && <div className="field-error" style={{ marginBottom: 10 }}>{errors.sport}</div>}
+              <div className="sport-grid">
+                {SPORTS.map((s) => (
+                  <button
+                    type="button"
+                    key={s.key}
+                    className={`sport-card ${data.sport === s.key ? "selected" : ""}`}
+                    onClick={() => update({ sport: s.key })}
+                  >
+                    <div className="sport-title">{s.key}</div>
+                    <div className="sport-desc">{s.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="section">
+              <h3 className="section-title">Στοιχεία Παιδιού</h3>
+              <div className="grid-2">
+                <Field label="Ονοματεπώνυμο παιδιού" required error={errors.childName} id="f-childName">
+                  <input className="input" value={data.childName} onChange={(e) => update({ childName: e.target.value })} />
+                </Field>
+                <Field label="Ηλικία" required error={errors.childAge} id="f-childAge">
+                  <input className="input" inputMode="numeric" value={data.childAge} onChange={(e) => update({ childAge: e.target.value.replace(/[^\d]/g, "") })} />
+                </Field>
+                <Field label="Φύλο" required error={errors.childGender} id="f-childGender">
+                  <div className="choice-row">
+                    {["Αγόρι", "Κορίτσι"].map((opt) => (
+                      <label key={opt} className={`choice ${data.childGender === opt ? "checked" : ""}`}>
+                        <input type="radio" checked={data.childGender === opt} onChange={() => update({ childGender: opt })} />
+                        {opt}
+                      </label>
+                    ))}
+                  </div>
+                </Field>
+                <Field label="Τόπος κατοικίας" required error={errors.childCity} id="f-childCity">
+                  <input className="input" value={data.childCity} onChange={(e) => update({ childCity: e.target.value })} />
+                </Field>
+              </div>
+            </section>
+
+            <section className="section">
+              <h3 className="section-title">Στοιχεία Κηδεμόνα</h3>
+              <div className="grid-2">
+                <Field label="Ονοματεπώνυμο" required error={errors.guardianName} id="f-guardianName">
+                  <input className="input" value={data.guardianName} onChange={(e) => update({ guardianName: e.target.value })} />
+                </Field>
+                <Field label="Αριθμός τηλεφώνου" required error={errors.guardianPhone} id="f-guardianPhone">
+                  <input className="input" value={data.guardianPhone} onChange={(e) => update({ guardianPhone: e.target.value })} />
+                </Field>
+              </div>
+            </section>
+
+            <section className="section" id="f-consent">
+              <label className={`consent ${errors.consent ? "consent-error" : ""}`}>
+                <input type="checkbox" checked={data.consent} onChange={(e) => update({ consent: e.target.checked })} />
+                <span>
+                  Συναινώ στη συλλογή και επεξεργασία των παραπάνω στοιχείων από τη σχολή, αποκλειστικά για την
+                  επικοινωνία σχετικά με τα αθλητικά προγράμματα.
+                </span>
+              </label>
+              {errors.consent && <div className="field-error" style={{ marginTop: 6 }}>{errors.consent}</div>}
+              <a className="privacy-link" href="/privacy" target="_blank" rel="noopener noreferrer">
+                Πολιτική Απορρήτου
+              </a>
+            </section>
+
+            {submitError && <div className="submit-error">{submitError}</div>}
+
+            <button className="btn-primary btn-submit" onClick={handleSubmit} disabled={saving}>
+              {saving ? "Αποστολή…" : "Υποβολή Εκδήλωσης Ενδιαφέροντος"}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
